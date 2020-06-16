@@ -4,7 +4,7 @@
 # Script: root_tree.R
 # --- Action: Makes starting tree for BEAST.
 # --- Input: rooted astral tree
-# --- Output: rooted ultrametric starting tree (calibrated)
+# --- Output: rooted calibrated starting tree
 # Author: https://osf.io/7y59t/wiki/home/, adapted by Maya Schrödl
 ###########################################################################
 rm(list=ls())

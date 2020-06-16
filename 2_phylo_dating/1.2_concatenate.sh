@@ -2,7 +2,7 @@
 ###########################################################################
 # Project: Orania Phylogeny MT
 # Script: hashrf.sh
-# --- Action: Concatenated the selected gene alignments for dating
+# --- Action: Concatenate the selected gene alignments for dating
 # --- Input: selected genes
 # --- Output: concatenated alignments
 # Author: Maya Schroedl
@@ -49,41 +49,62 @@ mkdir -p $WD/3_gene_shop/selected_genes
 
 cd $WD/1_alignment/
 
-#concatenate all genes
+#### all genes #######
 
-pxcat -s $WD/1_alignment/*_gb_mod.fasta -o $WD/2_alignment/concat/all_genes_concat.fasta #install pxcat
-#### AFTER CONCATENATING REMOVE THE INDIVIDUAL SEQUENCES WHICH WERE SELECTED FOR DATING (SEE astra_dropped_tags.txt)
+#concatenate all genes a first time
+pxcat -s $WD/1_alignment/*_gb_mod.fasta -o $WD/2_alignment/concat/all_genes_concat.fasta 
 
+# 1) Get the individuals with the "best" alignment, in order to have only one 
+    #individual per species for dating with the script "get_best_indiv.R"
+
+# 2) manually remove the sequences in the concatenated alignement for the individuals
+        #which were not chosen for dating with the script "get_best_indiv.R"
 
 
 ########## select genes ###############
-# with script gene_shopping_dat.R
+
+# with script gene_shop_dat.R genes can be selected ("gene shopping") depending on 
+      #their gene tree - species tree conflict and whether they are clock-like or not
 
 ### concatenate selected genes
-
 concat() {
-	filename=$1
+	filename=$1 #dataset name
+	
+	#create a file containing a list of filenames (with their directory) which correspond to the alignments
+	    # of the genes which were selected for dating
+	
+	#get list of selecte genes and copy it for modification (add directory before file name; and suffix after)    
 	cp $WD/3_gene_shop/selected_genes/$filename.txt $WD/3_gene_shop/selected_genes/"$filename"_files.txt
+	
+	#add directory before filename
 	sed -i -e "s#^#/data_vol/maya/2_phylo_dating/1_alignment/##" $WD/3_gene_shop/selected_genes/"$filename"_files.txt
+	
+	#add alignment suffix to gene name
 	sed -i -e "s/$/_aligned_gb_mod.fasta/" $WD/3_gene_shop/selected_genes/"$filename"_files.txt
+	
+	#truncate carriage return
 	tr -d "\r" < $WD/3_gene_shop/selected_genes/"$filename"_files.txt  >  $filename.txt_ch  && mv  $filename.txt_ch $WD/3_gene_shop/selected_genes/"$filename"_files.txt 
 
+  #put all filenames into one variable for concatenation
 	selected_genes_str=$(cat $WD/3_gene_shop/selected_genes/"$filename"_files.txt  | tr "\r" " ")
 	
+	#see which alignments were chosen (print filenames)
 	echo $selected_genes_str
 	
+	#concatenate selected alignments
 	pxcat -s $selected_genes_str -o $WD/1_alignment/concat/"$filename"_concat.fasta
 }
 
 
 rm $WD/1_alignment/concat/*
-concat no_gdis
-concat most_diff
-concat clock_one
-concat clock_three
-concat clock_nine
 
-#### AFTER CONCATENATING REMOVE THE INDIVIDUAL SEQUENCES WHICH WERE SELECTED FOR DATING (SEE astra_dropped_tags.txt)
+concat no_gdis #concatenate alignments of the selected genes that had no
+                #well-supported nodes (BS > 75%) disagreeing with the species tree
+                
+concat clock_one #concatenate alignemts of the most "clock-like" gene
 
+####################
+#manually remove the sequences in the concatenated alignement for the individuals
+        #which were not chosen for dating with the script "get_best_indiv.R" (see above)
 
 

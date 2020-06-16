@@ -53,23 +53,23 @@ signal_support_stats=function(genetree, gene_name, sptree, output)
   # Get "theoretical number of nodes (without polytomies)
   node_num_theo = multi2di(genetree)$Nnode - no_support # resolve randomly polytomies and get the number of theoretical nodes (excluding the nodes without support)
   
-  # Node dataframe with weighted polytomies (node with polytomy counts x2 (for trichotomy), x3 etc.) to calculate percentage
+  # Node dataframe with weighted polytomies (node with polytomy counts x2 (for trichotomy), x3 (for 4tomy) etc.) to calculate percentage
   polyt=as.data.frame(table(genetree$edge[,1])-1)[-no_support_num,] # df of which nodes present a polytomy (Freq = 2 means that the node is trichotomous)
-  merged = merge(nodes_df,polyt, by.x="node.nums", by.y= "Var1") # merde node df and polytomie df
+  merged = merge(nodes_df,polyt, by.x="node.nums", by.y= "Var1") # merge node df and polytomy df
   nodes_df_weighted = as.data.frame(lapply(merged, rep, merged$Freq)) # df where nodes are as many times represented as "theoretical" nodes would be [if polytomy resolved]
   
   
   ### 1) How informative is the gene tree ----
   
   #--- Which nodes are "good" (BS >= 75)
-  gnodes = nodes_df$node.nums[which(nodes_df$node.label >= 75)] # select nodes that have a bootstrap value > 75
+    gnodes = nodes_df$node.nums[which(nodes_df$node.label >= 75)] # select nodes that have a bootstrap value > 75
   
-  gnodes_weighted = nodes_df_weighted$node.nums[which(nodes_df_weighted$node.label >= 75)] # list of good nodes, weighted by the polytomies (node numbers multiplicated)
+    gnodes_weighted = nodes_df_weighted$node.nums[which(nodes_df_weighted$node.label >= 75)] # list of good nodes, weighted by the polytomies (node numbers multiplicated)
   
-  #--- How many "good" nodes (BS >= 75) [as a percentage relative to theoretical number of nodes] (weighted by polytomies)
+    #--- How many "good" nodes (BS >= 75) [as a percentage relative to theoretical number of nodes] (weighted by polytomies)
   
-  gnodes_num = length(which(nodes_df_weighted$node.label >= 75)) # how many nodes are "good" (BS > 75)
-  gnodes_perc = gnodes_num/node_num_theo*100 # relative percentage of good nodes for this gene tree (weighted by polytomies)
+    gnodes_num = length(which(nodes_df_weighted$node.label >= 75)) # how many nodes are "good" (BS > 75)
+    gnodes_perc = gnodes_num/node_num_theo*100 # relative percentage of good nodes for this gene tree (weighted by polytomies)
   
   ### 2) How many nodes agree/disagree with sptree? ----
   #--- Is the clade corresponding to node X monophyletic in the species tree? (agrees)
@@ -79,36 +79,45 @@ signal_support_stats=function(genetree, gene_name, sptree, output)
         selected_clade_tree = extract.clade(genetree,node_num)
         return(is.monophyletic(sptree,selected_clade_tree$tip.label))}
   
-  nd_agree = sapply(nodes_df_weighted$node.nums, sptree_agrees) # which nodes agree with sptree (weighted)
-  nd_agree_perc = length(which(nd_agree==T))/node_num_theo*100 # percentage of nodes that agree with sptree (weighted)
+      nd_agree = sapply(nodes_df_weighted$node.nums, sptree_agrees) # which nodes agree with sptree (weighted)
+      nd_agree_perc = length(which(nd_agree==T))/node_num_theo*100 # percentage of nodes that agree with sptree (weighted)
   
-  nd_disagree = !(sapply(nodes_df_weighted$node.nums, sptree_agrees)) # which nodes disagree with sptree (weighted)
-  nd_disagree_perc = length(which(nd_disagree==T))/node_num_theo*100 # percentage of nodes that disagree with sptree (weighted)
+      nd_disagree = !(sapply(nodes_df_weighted$node.nums, sptree_agrees)) # which nodes disagree with sptree (weighted)
+      nd_disagree_perc = length(which(nd_disagree==T))/node_num_theo*100 # percentage of nodes that disagree with sptree (weighted)
   
 
-  ### 3) How many nodes are "good" (BS >= 75) and agree/disagree with the species tree ---
-  gnd_agree = sapply(gnodes_weighted, sptree_agrees) # which good nodes agree with sptree (weighted)
-  gnd_agree_perc = length(which(gnd_agree==T))/node_num_theo*100 # percentage of nodes that are good nodes and agree with sptree (weighted)
+  ### 3) How many nodes are "good" (BS >= 75) and agree/disagree with the species tree ----
+      gnd_agree = sapply(gnodes_weighted, sptree_agrees) # which good nodes agree with sptree (weighted)
+      gnd_agree_perc = length(which(gnd_agree==T))/node_num_theo*100 # percentage of nodes that are good nodes and agree with sptree (weighted)
   
   #--- Is the clade corresponding to node X not monophyletic in the species tree? (disagrees)
-  gnd_disagree = !(sapply(gnodes_weighted, sptree_agrees)) # which good nodes disagree with sptree (weighted)
-  gnd_disagree_perc = length(which(gnd_disagree==T))/node_num_theo*100 # percentage of nodes that are good nodes and disagree with sptree (weighted)
-  gnd_disagree_nbr = length(which(gnd_disagree==T)) # how many good nodes disagree
+      gnd_disagree = !(sapply(gnodes_weighted, sptree_agrees)) # which good nodes disagree with sptree (weighted)
+      gnd_disagree_perc = length(which(gnd_disagree==T))/node_num_theo*100 # percentage of nodes that are good nodes and disagree with sptree (weighted)
+      gnd_disagree_nbr = length(which(gnd_disagree==T)) # how many good nodes disagree
 
 
-  ###  clock-likeness -----
+  ###  4) clock-likeness -----
   # Root-tip-variance as proxy of "clock-likeness". Check: Smith, S. A., Brown, J. W., & Walker, J. F. (2018). So many genes, so little time: a practical approach to divergence-time estimation in the genomic era. PloS one, 13(5). https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0197433 
-  root_tip_var = var(adephylo::distRoot(genetree_original))
+      root_tip_var = var(adephylo::distRoot(genetree_original))
   
   ### Export results ----
-  resultdf=data.frame("genetree" = gene_name, "gnodes_perc" = round(gnodes_perc,3),"nd_agree_perc" = nd_agree_perc, "nd_disagree_perc" = nd_disagree_perc,"gnd_agree_perc" = round(gnd_agree_perc,3),"gnd_disagree_perc" = round(gnd_disagree_perc,3), "gnd_disagree_nbr" = round(gnd_disagree_nbr,3), "diff_ga_gd" = round(gnd_agree_perc - gnd_disagree_perc,3), "root_tip_var" = round(root_tip_var*100000,3) )
+      resultdf = data.frame("genetree" = gene_name, 
+                            "gnodes_perc" = round(gnodes_perc,3),
+                            "nd_agree_perc" = nd_agree_perc, 
+                            "nd_disagree_perc" = nd_disagree_perc,
+                            "gnd_agree_perc" = round(gnd_agree_perc,3),
+                            "gnd_disagree_perc" = round(gnd_disagree_perc,3), 
+                            "gnd_disagree_nbr" = round(gnd_disagree_nbr,3),
+                            "diff_ga_gd" = round(gnd_agree_perc - gnd_disagree_perc,3), #difference between percentage of agreeing and disagreeing good nodes
+                            "root_tip_var" = round(root_tip_var*100000,3) )
   
   # if output file exists and is not empty:
-  if ((file.exists(output)) & (file.info(output)$size != 0)){
+      if ((file.exists(output)) & (file.info(output)$size != 0)){
     # append resultdf to existing file
-    write.table(resultdf,output,append = T, quote = F,  row.names=FALSE, col.names=FALSE)} else {
+           write.table(resultdf,output,append = T, quote = F,  row.names=FALSE, col.names=FALSE)
+        } else {
     # create a new file with resultdf
-    write.table(resultdf,output, quote = F, row.names=FALSE)
+      write.table(resultdf,output, quote = F, row.names=FALSE)
     }
   
 } # end of function

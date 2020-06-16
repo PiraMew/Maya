@@ -4,4 +4,4 @@
 #SBATCH -c 1
 #SBATCH --time 2-0
 
-../../beast/bin/beast most_diff_concat.xml
+../../beast/bin/beast no_gdis_concat.xml

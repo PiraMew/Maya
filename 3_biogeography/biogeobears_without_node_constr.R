@@ -556,7 +556,7 @@ if (runslow)
   resBAYAREALIKE_DB = res
 }
 
-#---- Dispersal model Federmann (DF) ----
+#---- Dispersal model Federman (DF) ----
 
 ## DEC  ANALYSIS ----
 
@@ -585,8 +585,8 @@ BioGeoBEARS_run_object$num_cores_to_use = 1
 BioGeoBEARS_run_object$force_sparse = FALSE    # force_sparse=TRUE causes pathology & isn't much faster at this scale
 
 # Set up a time-stratified analysis:
-BioGeoBEARS_run_object$timesfn = file.path(wd,"timeperiods_Federmann.txt")
-BioGeoBEARS_run_object$dispersal_multipliers_fn = file.path(wd,"manual_dispersal_multipliers_Federmann.txt")
+BioGeoBEARS_run_object$timesfn = file.path(wd,"timeperiods_Federman.txt")
+BioGeoBEARS_run_object$dispersal_multipliers_fn = file.path(wd,"manual_dispersal_multipliers_Federman.txt")
 #BioGeoBEARS_run_object$areas_allowed_fn = "areas_allowed.txt"
 #BioGeoBEARS_run_object$areas_adjacency_fn = "areas_adjacency.txt"
 #BioGeoBEARS_run_object$distsfn = "distances_matrix.txt"
@@ -659,8 +659,8 @@ BioGeoBEARS_run_object$num_cores_to_use = 1
 BioGeoBEARS_run_object$force_sparse = FALSE    # force_sparse=TRUE causes pathology & isn't much faster at this scale
 
 # Set up a time-stratified analysis:
-BioGeoBEARS_run_object$timesfn = file.path(wd,"timeperiods_Federmann.txt")
-BioGeoBEARS_run_object$dispersal_multipliers_fn = file.path(wd,"manual_dispersal_multipliers_Federmann.txt")
+BioGeoBEARS_run_object$timesfn = file.path(wd,"timeperiods_Federman.txt")
+BioGeoBEARS_run_object$dispersal_multipliers_fn = file.path(wd,"manual_dispersal_multipliers_Federman.txt")
 #BioGeoBEARS_run_object$areas_allowed_fn = "areas_allowed.txt"
 #BioGeoBEARS_run_object$areas_adjacency_fn = "areas_adjacency.txt"
 #BioGeoBEARS_run_object$distsfn = "distances_matrix.txt"
@@ -745,8 +745,8 @@ BioGeoBEARS_run_object$force_sparse = FALSE    # force_sparse=TRUE causes pathol
 
 
 # Set up a time-stratified analysis:
-BioGeoBEARS_run_object$timesfn = file.path(wd,"timeperiods_Federmann.txt")
-BioGeoBEARS_run_object$dispersal_multipliers_fn = file.path(wd,"manual_dispersal_multipliers_Federmann.txt")
+BioGeoBEARS_run_object$timesfn = file.path(wd,"timeperiods_Federman.txt")
+BioGeoBEARS_run_object$dispersal_multipliers_fn = file.path(wd,"manual_dispersal_multipliers_Federman.txt")
 #BioGeoBEARS_run_object$areas_allowed_fn = "areas_allowed.txt"
 #BioGeoBEARS_run_object$areas_adjacency_fn = "areas_adjacency.txt"
 #BioGeoBEARS_run_object$distsfn = "distances_matrix.txt"
@@ -828,7 +828,7 @@ res.dec_DB = extract_params_from_BioGeoBEARS_results_object(results_object=resDE
 res.dl_DB = extract_params_from_BioGeoBEARS_results_object(results_object=resDIVALIKE_DB, returnwhat="table", paramsstr_digits=4)
 res.b_DB = extract_params_from_BioGeoBEARS_results_object(results_object=resBAYAREALIKE_DB, returnwhat="table", paramsstr_digits=4)
 
-#DF: Federmann
+#DF: Federman
 res.dec_DF = extract_params_from_BioGeoBEARS_results_object(results_object=resDEC_DF, returnwhat="table", paramsstr_digits=4)
 res.dl_DF = extract_params_from_BioGeoBEARS_results_object(results_object=resDIVALIKE_DF, returnwhat="table", paramsstr_digits=4)
 res.b_DF = extract_params_from_BioGeoBEARS_results_object(results_object=resBAYAREALIKE_DF, returnwhat="table", paramsstr_digits=4)

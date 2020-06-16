@@ -1,8 +1,8 @@
 ###########################################################################
 # Project: Orania Phylogeny MT
 # Script: get_best_indiv.R
-# --- Action: for the species where we have two sequences, we will only chose the sequence with the alignments with least gaps (for monophyletic sequences) for dating and two sequences for non-monophyletic sequences
-# --- Input: 
+# --- Action: for the species where we have two sequences, we will only choose the sequence with the alignments with least gaps (for monophyletic sequences) for dating and two sequences for non-monophyletic sequences. the tips of the astral individual tree which correspond to the non-selected individuals were dropped
+# --- Input: All alignments concatenated + list of which TAG corresponds to which individual name
 # --- Output: 
 # Author: Maya Schroedl
 ###########################################################################
@@ -32,7 +32,8 @@ tag_sp = read.table(file.path(gwd,"1_phylo_reconstruction","input_reads_and_info
 # Get alignments
 all_alignments_concat = read.fasta(file.path(wd, "1_alignment", "concat", "all_genes_concat.fasta")) #get concatenated alignments for all individuals
 
-get_gap_perc = function(indiv_num){ #get per individuum the percentage of gaps in alignment
+#get per individual the percentage of gaps in alignment
+get_gap_perc = function(indiv_num){ 
   indiv_name = attr(all_alignments_concat[indiv_num],"name")
   empty = length(which(all_alignments_concat[indiv_num][[1]]=="-"))+length(which(all_alignments_concat[indiv_num][[1]]=="n")) #number of gaps in alignment
   
@@ -41,7 +42,7 @@ get_gap_perc = function(indiv_num){ #get per individuum the percentage of gaps i
   return(c(indiv_name, perc))
 }
 
-
+#percentage of gaps for each tag
 gap_perc = data.frame(do.call("rbind", lapply(1:length(all_alignments_concat), get_gap_perc)))
 
 colnames(gap_perc) = c("tags","gap_perc")
@@ -52,9 +53,9 @@ gap_perc_merg = merge(gap_perc,tag_sp, by="tags") #merge with corresponding name
 ### GET THE INDIVIDUAL WITH THE LOWEST NUMBER OF GAPS IN ALIGNMENT
 ### Except for O. lauterbachiana & O. palindan. Because their individuals are not monophyletic. 
 
-gap_perc_merg_without_ol_op = gap_perc_merg[-which(gap_perc_merg$indiv %in% c("Orania_lauterbachiana","Orania_palindan")),]
+gap_perc_merg_without_ol_op = gap_perc_merg[-which(gap_perc_merg$indiv %in% c("Orania_lauterbachiana","Orania_palindan")),] #df of gap percentage without o. lauterbachiana & o. palindan
 
-
+#chose individuals which have the least gaps
 filtered_list_of_indiv = gap_perc_merg_without_ol_op %>%
   group_by(indiv) %>%
   summarize(gap_perc_min = min(gap_perc), tag_min = tags[which.min(gap_perc)])
@@ -62,11 +63,9 @@ filtered_list_of_indiv = gap_perc_merg_without_ol_op %>%
 final_vector_indiv = filtered_list_of_indiv$tag_min
 
 ## for O. palidan: keep both because only two individuals
-
 final_vector_indiv = c(final_vector_indiv, tag_sp$tags[which(tag_sp$indiv == "Orania_palindan")])
 
 ## for O. lauterbachiana: keep TAG-24; and the one with the least gaps of the monophyletic group (TAG-22,TAG-23)
-
 gap_perc_merg_laut_1_2 = gap_perc_merg[which(gap_perc_merg$tags %in% c("TAG-22","TAG-23")),]
 laut_1_2_min = gap_perc_merg_laut_1_2$tags[which.min(gap_perc_merg_laut_1_2$gap_perc)]
 
@@ -84,6 +83,7 @@ astral_tree = read.tree(file.path(gwd,"1_phylo_reconstruction", "4_coalescent_tr
 #which tips shall be droped:
 drop_these = tag_sp$tags[which(tag_sp$tags %!in% final_vector_indiv)]
 
+#list of individuals which were dropped (not taken for dating)
 write.table(drop_these, file.path(astral_gene_dir, "astral_dropped_tags.txt"),row.names = F,col.names = F,quote = F)
 
 astral_dropped = drop.tip(astral_tree,drop_these)
@@ -93,7 +93,7 @@ write.tree(astral_dropped, file.path(astral_gene_dir,"astral_for_dating.tree"))
 
 
 # Gene trees --------------------------------------------------------------
-# 
+
 gene_dir = file.path(wd, "2_astral_gene_trees","gene_trees_drop")
 if (!dir.exists(gene_dir)){dir.create(gene_dir)}
 
