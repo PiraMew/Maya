@@ -2,11 +2,10 @@
 ###########################################################################
 # Project: Orania Phylogeny MT
 # Script: change_tiplabels.R
-# --- Action: 
-# --- Input: 
-# --- Output: 
-# Author: Maya Schroedl
-# Date: 04/2020
+# --- Action: Change tiplabels from TAG notation to individual names
+# --- Input: tree with tiplabels in TAG notation
+# --- Output: tree with tiplabels in individual name notation
+# Author: Maya Schroedl (maya.schroedl@bios.au.dk)
 ###########################################################################
 
 #rm(list=ls())

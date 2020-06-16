@@ -1,10 +1,15 @@
+#!/usr/bin/env Rscript
+###########################################################################
+# Project: Orania Phylogeny MT
+# Script: phylo_viz.R
+# --- Action: Visualize trees
+# Author: Maya Schroedl (maya.schroedl@bios.au.dk)
+###########################################################################
 
-#beautiful phylo viz
-
-library("ggplot2")
-library("ggtree")
-
-library("ape")
+# Packages ---------------------------------------------------------------
+if (!require('ape')) install.packages('ape'); library('ape')
+if (!require('ggplot2')) install.packages('ggplot2'); library('ggplot2')
+if (!require('ggtree')) install.packages('ggtree'); library('ggtree')
 
 # WD  --------------------------------------------------------------
 gwd=getwd() # global working directory
